@@ -1,20 +1,31 @@
 module Test.Main where
 
 import Prelude
-import Data.ModularArithmetic
-import Control.Monad.Eff.Console (logShow)
-import Data.Typelevel.Num (D11)
-import Test.QuickCheck (class Arbitrary, Result, arbitrary, quickCheck, (<?>))
-import Test.QuickCheck.Gen (elements)
+
+import Control.Monad.Eff (Eff)
+import Control.Monad.Eff.Console (CONSOLE)
+import Control.Monad.Eff.Exception (EXCEPTION)
+import Control.Monad.Eff.Random (RANDOM)
+import Data.ModularArithmetic (class Prime, Z, genZ, inverse)
+import Data.Typelevel.Num (class Pos, D11)
+import Test.QuickCheck (class Arbitrary, Result, quickCheck, (<?>))
 import Test.QuickCheck.Laws.Data (checkCommutativeRing, checkEuclideanRing, checkField, checkRing, checkSemiring)
 import Type.Proxy (Proxy(..))
 
-type Z11 = Z D11
+type Z11 = ArbitraryZ D11
 
+main
+  :: forall eff
+   . Eff
+     ( console :: CONSOLE
+     , random :: RANDOM
+     , exception :: EXCEPTION
+     | eff )
+     Unit
 main = do
   let p = Proxy :: Proxy Z11
 
-  quickCheck (inverses :: Z11 -> _)
+  quickCheck (inverses :: Z11 -> Result)
 
   checkSemiring p
   checkRing p
@@ -22,11 +33,25 @@ main = do
   checkEuclideanRing p
   checkField p
 
-inverses :: forall m. (Prime m) => Z m -> Result
-inverses x = go <?> "x: " <> show x
+inverses :: forall m. (Prime m) => ArbitraryZ m -> Result
+inverses (ArbitraryZ x) = go <?> "x: " <> show x
   where
     go
       | x /= zero =
           x * inverse x == one
       | otherwise =
           true
+
+newtype ArbitraryZ m = ArbitraryZ (Z m)
+derive newtype instance eqZ :: Eq (ArbitraryZ m)
+derive newtype instance ordZ :: Ord (ArbitraryZ m)
+derive newtype instance showZ :: Show (ArbitraryZ m)
+derive newtype instance semiringZ :: Pos m => Semiring (ArbitraryZ m)
+derive newtype instance ringZ :: Pos m => Ring (ArbitraryZ m)
+derive newtype instance commutativeRingZ
+  :: Pos m => CommutativeRing (ArbitraryZ m)
+derive newtype instance euclideanRingZ
+  :: Prime m => EuclideanRing (ArbitraryZ m)
+derive newtype instance fieldZ :: Prime m => Field (ArbitraryZ m)
+instance arbitraryZ :: Pos m => Arbitrary (ArbitraryZ m) where
+  arbitrary = ArbitraryZ <$> genZ
