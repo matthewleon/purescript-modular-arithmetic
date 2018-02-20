@@ -25,6 +25,6 @@
   "devDependencies": {
     "purescript-psci-support": "^3.0.0",
     "purescript-quickcheck": "^4.0.0",
-    "purescript-quickcheck-laws": "^3.0.0"
+    "purescript-quickcheck-laws": "matthewleon/purescript-quickcheck-laws#arbitraryless"
   }
 }
