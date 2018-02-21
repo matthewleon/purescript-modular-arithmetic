@@ -16,11 +16,11 @@
     "url": "https://github.com/hdgarrood/purescript-modular-arithmetic"
   },
   "dependencies": {
-    "purescript-typelevel": "^3.0.0",
     "purescript-console": "^3.0.0",
     "purescript-arrays": "^4.0.1",
     "purescript-nonempty": "^4.0.0",
-    "purescript-gen": "^1.1.1"
+    "purescript-gen": "^1.1.1",
+    "purescript-num-kind": "matthewleon/purescript-nat-kind"
   },
   "devDependencies": {
     "purescript-psci-support": "^3.0.0",

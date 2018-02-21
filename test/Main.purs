@@ -7,9 +7,9 @@ import Control.Monad.Eff.Console (CONSOLE)
 import Control.Monad.Eff.Exception (EXCEPTION)
 import Control.Monad.Eff.Random (RANDOM)
 import Data.ModularArithmetic (class Prime, Z, genZ, inverse)
-import Data.Typelevel.Num (class Pos, D11)
 import Test.QuickCheck (class Arbitrary, Result, quickCheck, (<?>))
 import Test.QuickCheck.Laws.Data (checkCommutativeRing, checkEuclideanRing, checkField, checkRing, checkSemiring)
+import Type.Data.Nat (class Pos, D11)
 import Type.Proxy (Proxy(..))
 
 type Z11 = ArbitraryZ D11

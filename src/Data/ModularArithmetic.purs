@@ -13,8 +13,7 @@ import Prelude
 import Control.Monad.Gen (class MonadGen, chooseInt)
 import Data.Array as Array
 import Data.NonEmpty (NonEmpty, (:|))
-import Data.Typelevel.Num (class Pos, type (:*), D1, D2, D3, D5, D7, toInt)
-import Data.Typelevel.Undefined (undefined)
+import Type.Data.Nat (kind Nat, class Pos, type (:*), D1, D2, D3, D5, D7, NProxy(..), toInt)
 
 -- | Integers modulo some positive integer m.
 -- |
@@ -29,7 +28,7 @@ import Data.Typelevel.Undefined (undefined)
 -- |
 -- | The runtime representation is identical to that of `Int`, except that
 -- | values are guaranteed to be between 0 and m-1.
-newtype Z m = Z Int
+newtype Z (m :: Nat) = Z Int
 
 derive newtype instance eqZ :: Eq (Z m)
 derive newtype instance ordZ :: Ord (Z m)
@@ -39,7 +38,7 @@ derive newtype instance showZ :: Show (Z m)
 mkZ :: forall m. Pos m => Int -> Z m
 mkZ x =
   let
-    m = toInt (undefined :: m)
+    m = toInt (NProxy :: NProxy m)
   in
     -- This ensures that we get a number between 0 and m-1
     Z (((x `mod` m) + m) `mod` m)
@@ -87,7 +86,7 @@ instance fieldZ :: Prime m => Field (Z m)
 inverse :: forall m. Prime m => Z m -> Z m
 inverse (Z a) = mkZ (go 0 n 1 a)
   where
-    n = toInt (undefined :: m)
+    n = toInt (NProxy :: NProxy m)
 
     go t _ _ 0 =
       t
@@ -101,10 +100,10 @@ inverse (Z a) = mkZ (go 0 n 1 a)
 enumerate :: forall m. Pos m => NonEmpty Array (Z m)
 enumerate =
   let
-    m = toInt (undefined :: m)
+    m = toInt (NProxy :: NProxy m)
   in
     mkZ 0 :| (if m == 1 then [] else map mkZ (Array.range 1 (m - 1)))
 
 -- | Create a random generator for members of Z_m.
 genZ :: forall m n. MonadGen m => Pos n => m (Z n)
-genZ = Z <$> chooseInt 0 (toInt (undefined :: n) - 1)
+genZ = Z <$> chooseInt 0 (toInt (NProxy :: NProxy n) - 1)
